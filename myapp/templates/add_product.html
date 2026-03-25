@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}Sell an Item - CampusKart{% endblock %}
+
+{% block content %}
+<style>
+    .form-page {
+        display: flex;
+        justify-content: center;
+        padding: 1rem 1rem 3rem;
+    }
+    .form-card {
+        max-width: 700px;
+        width: 100%;
+    }
+    .form-page-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1.5px solid var(--border-color);
+    }
+    .form-page-title {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 0.35rem;
+        letter-spacing: -0.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .form-page-title-icon {
+        width: 40px; height: 40px;
+        background: var(--brand-gradient);
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1rem;
+        box-shadow: 0 3px 10px rgba(16,185,129,0.3);
+    }
+    .form-page-subtitle {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin: 0;
+        padding-left: 50px;
+    }
+    .form-text { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.3rem; }
+    .error-text { font-size: 0.78rem; color: var(--danger-color); margin-top: 0.3rem; display: block; }
+
+    /* Image Upload Area */
+    .upload-area {
+        border: 2px dashed var(--border-color);
+        border-radius: var(--radius-md);
+        padding: 2rem;
+        text-align: center;
+        transition: all var(--transition-base);
+        cursor: pointer;
+        background: var(--bg-elevated);
+        position: relative;
+    }
+    .upload-area:hover {
+        border-color: var(--brand-primary);
+        background: var(--brand-primary-light);
+    }
+    .upload-area input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+    }
+    .upload-icon {
+        width: 50px; height: 50px;
+        background: var(--brand-primary-light);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.25rem;
+        color: var(--brand-primary);
+        transition: all var(--transition-fast);
+    }
+    .upload-area:hover .upload-icon {
+        background: var(--brand-primary);
+        color: #fff;
+    }
+    .upload-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 0.25rem;
+    }
+    .upload-hint { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* Price Input */
+    .price-input-group {
+        position: relative;
+    }
+    .price-prefix {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-elevated);
+        border: 1.5px solid var(--border-color);
+        border-right: none;
+        border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+        font-weight: 700;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    .price-input-group .form-control {
+        padding-left: 52px;
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1.75rem;
+        border-top: 1.5px solid var(--border-color);
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+    }
+</style>
+
+<div class="form-page">
+    <div class="card-custom form-card">
+        <div class="form-page-header">
+            <h1 class="form-page-title">
+                <div class="form-page-title-icon"><i class="fas fa-tag"></i></div>
+                Sell an Item
+            </h1>
+            <p class="form-page-subtitle">List your product and reach hundreds of students instantly.</p>
+        </div>
+
+        <div class="info-box mb-4">
+            <i class="fas fa-lightbulb"></i>
+            <div><strong>Tip:</strong> Clear photos and honest descriptions help you sell 3× faster. Include brand, usage period, and any defects.</div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Product Name -->
+            <div class="mb-4">
+                <label for="{{ form.name.id_for_label }}" class="form-label">Product Title <span style="color:var(--danger-color);">*</span></label>
+                {{ form.name }}
+                {% if form.name.errors %}<span class="error-text"><i class="fas fa-exclamation-circle me-1"></i>{{ form.name.errors.0 }}</span>{% endif %}
+            </div>
+
+            <!-- Category & Condition -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label for="{{ form.category.id_for_label }}" class="form-label">Category <span style="color:var(--danger-color);">*</span></label>
+                    {{ form.category }}
+                    {% if form.category.errors %}<span class="error-text">{{ form.category.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.condition.id_for_label }}" class="form-label">Condition <span style="color:var(--danger-color);">*</span></label>
+                    {{ form.condition }}
+                    {% if form.condition.errors %}<span class="error-text">{{ form.condition.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-4">
+                <label for="{{ form.price.id_for_label }}" class="form-label">Price <span style="color:var(--danger-color);">*</span></label>
+                <div class="price-input-group">
+                    <div class="price-prefix">₹</div>
+                    {{ form.price }}
+                </div>
+                {% if form.price.errors %}<span class="error-text">{{ form.price.errors.0 }}</span>{% endif %}
+                <div class="form-text">Set a fair price. You can always negotiate with the buyer.</div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+                <label for="{{ form.description.id_for_label }}" class="form-label">Description <span style="color:var(--danger-color);">*</span></label>
+                {{ form.description }}
+                {% if form.description.errors %}<span class="error-text">{{ form.description.errors.0 }}</span>{% endif %}
+                <div class="form-text">Include brand, usage duration, defects, or exciting features to attract buyers.</div>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="mb-4">
+                <label class="form-label">Product Image</label>
+                <div class="upload-area" id="uploadArea">
+                    {{ form.image }}
+                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <div class="upload-label" id="uploadLabel">Click to upload or drag & drop</div>
+                    <div class="upload-hint">Supported: JPG, PNG, WEBP (max 5MB)</div>
+                </div>
+                {% if form.image.errors %}<span class="error-text">{{ form.image.errors.0 }}</span>{% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn-primary-custom" style="min-width: 160px; border-radius: var(--radius-sm);">
+                    <i class="fas fa-tag"></i> List Product
+                </button>
+                <a href="{% url 'dashboard' %}" class="btn-outline-custom" style="border-radius: var(--radius-sm);">
+                    <i class="fas fa-times me-1"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Show filename in upload area
+const fileInput = document.querySelector('input[type="file"]');
+const uploadLabel = document.getElementById('uploadLabel');
+if (fileInput && uploadLabel) {
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            uploadLabel.textContent = this.files[0].name;
+        }
+    });
+}
+</script>
+{% endblock %}

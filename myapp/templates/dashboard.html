@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - CampusKart{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-hero {
+        background: linear-gradient(135deg, #0f1923 0%, #161e2d 100%);
+        border-radius: var(--radius-xl);
+        padding: 2.5rem 2.5rem 5rem;
+        margin-bottom: -3.25rem;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+    .dashboard-hero::before {
+        content: '';
+        position: absolute;
+        top: -60px; right: -60px;
+        width: 300px; height: 300px;
+        background: var(--brand-primary-glow);
+        border-radius: 50%;
+        filter: blur(80px);
+    }
+    .dashboard-hero-title {
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 0.3rem;
+        letter-spacing: -0.5px;
+        position: relative;
+        z-index: 1;
+    }
+    .dashboard-hero-subtitle {
+        color: rgba(255,255,255,0.55);
+        font-size: 0.92rem;
+        position: relative;
+        z-index: 1;
+    }
+    .dashboard-hero-subtitle strong { color: var(--brand-primary); }
+
+    /* Stat Cards */
+    .stat-card {
+        background: var(--bg-card);
+        border: 1.5px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.1rem;
+        box-shadow: var(--shadow-md);
+        transition: all var(--transition-base);
+        position: relative;
+        overflow: hidden;
+    }
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--stat-color, var(--brand-primary));
+        border-radius: 4px 0 0 4px;
+    }
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(16,185,129,0.2);
+    }
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+        background: var(--stat-bg, var(--brand-primary-light));
+        color: var(--stat-color, var(--brand-primary));
+    }
+    .stat-val {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-main);
+        line-height: 1;
+        letter-spacing: -0.5px;
+    }
+    .stat-label {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        font-weight: 700;
+        margin-top: 0.3rem;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+    }
+    .quick-action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.55rem 1.1rem;
+        border-radius: var(--radius-full);
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all var(--transition-fast);
+        background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.8);
+    }
+    .quick-action-btn:hover {
+        background: rgba(255,255,255,0.14);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+    .quick-action-btn.primary {
+        background: var(--brand-primary);
+        border-color: var(--brand-primary);
+        color: #fff;
+        box-shadow: 0 2px 10px rgba(16,185,129,0.3);
+    }
+    .quick-action-btn.primary:hover {
+        background: var(--brand-primary-hover);
+        box-shadow: var(--shadow-brand);
+    }
+
+    /* Dashboard Items */
+    .dash-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--border-color);
+        gap: 1rem;
+        transition: background var(--transition-fast);
+    }
+    .dash-item:last-child { border-bottom: none; }
+    .dash-item-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 0.2rem;
+        line-height: 1.3;
+    }
+    .dash-item-meta {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+    .dash-item-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex-shrink: 0;
+    }
+</style>
+
+<!-- Hero -->
+<div class="container" style="padding-top: 0.5rem;">
+    <div class="dashboard-hero">
+        <h1 class="dashboard-hero-title">
+            <i class="fas fa-wave-square me-2" style="color: var(--brand-primary);"></i>
+            Hello, {{ user.username }}! 👋
+        </h1>
+        <p class="dashboard-hero-subtitle">Manage your listings, track requests, and grow your campus presence.</p>
+        <div class="quick-actions">
+            <a href="{% url 'add_product' %}" class="quick-action-btn primary">
+                <i class="fas fa-plus"></i> New Listing
+            </a>
+            <a href="{% url 'product_list' %}" class="quick-action-btn">
+                <i class="fas fa-search"></i> Browse Items
+            </a>
+            <a href="{% url 'manage_requests' %}" class="quick-action-btn">
+                <i class="fas fa-envelope"></i> View Requests
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="row g-3 mb-4" style="margin-top: 0;">
+        <div class="col-md-4">
+            <div class="stat-card" style="--stat-color: #10b981; --stat-bg: #d1fae5;">
+                <div class="stat-icon"><i class="fas fa-box-open"></i></div>
+                <div>
+                    <div class="stat-val">{{ selling_count }}</div>
+                    <div class="stat-label">Items Listed</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="--stat-color: #3b82f6; --stat-bg: #dbeafe;">
+                <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
+                <div>
+                    <div class="stat-val">{{ buying_count }}</div>
+                    <div class="stat-label">Purchase Requests</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card" style="--stat-color: #f59e0b; --stat-bg: #fef3c7;">
+                <div class="stat-icon"><i class="fas fa-bell"></i></div>
+                <div>
+                    <div class="stat-val">{{ received_count }}</div>
+                    <div class="stat-label">Requests Received</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panels Row -->
+    <div class="row g-4 mb-4">
+        <!-- Your Listings -->
+        <div class="col-lg-6">
+            <div class="panel-card h-100">
+                <div class="panel-header">
+                    <h5 class="panel-title"><i class="fas fa-box-open me-2" style="color:var(--brand-primary);"></i>Your Listings</h5>
+                    <a href="{% url 'add_product' %}" class="panel-action-link">
+                        <i class="fas fa-plus"></i> Add New
+                    </a>
+                </div>
+                <div class="panel-body">
+                    {% if selling %}
+                        {% for product in selling|slice:":4" %}
+                            <div class="dash-item">
+                                <div style="min-width: 0;">
+                                    <div class="dash-item-title">{{ product.name|truncatechars:38 }}</div>
+                                    <div class="dash-item-meta">₹{{ product.price }} &bull; {{ product.get_condition_display }}</div>
+                                </div>
+                                <div class="dash-item-actions">
+                                    {% if product.is_sold %}
+                                        <span class="badge-pill badge-danger">Sold</span>
+                                    {% else %}
+                                        <span class="badge-pill badge-success">Live</span>
+                                    {% endif %}
+                                    <a href="{% url 'edit_product' product.id %}" class="btn-outline-custom"
+                                       style="padding: 0.3rem 0.75rem; font-size: 0.78rem; border-radius: var(--radius-sm);">
+                                        Edit
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% if selling.count > 4 %}
+                            <div class="mt-3 pt-2">
+                                <a href="{% url 'my_products' %}" class="btn-outline-custom w-100 d-flex justify-content-center" style="border-radius: var(--radius-sm); font-size:0.875rem;">
+                                    View All {{ selling.count }} Listings <i class="fas fa-chevron-right ms-2 opacity-60" style="font-size:0.75rem;"></i>
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="empty-state" style="padding: 2.5rem 1rem;">
+                            <div class="empty-state-icon" style="width:60px;height:60px;font-size:1.3rem;"><i class="fas fa-box"></i></div>
+                            <h5>No listings yet</h5>
+                            <p>Start selling to earn from your unused items.</p>
+                            <a href="{% url 'add_product' %}" class="btn-primary-custom">
+                                <i class="fas fa-plus"></i> Start Selling
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Purchase Requests -->
+        <div class="col-lg-6">
+            <div class="panel-card h-100">
+                <div class="panel-header">
+                    <h5 class="panel-title"><i class="fas fa-shopping-bag me-2" style="color:#3b82f6;"></i>Purchase Requests</h5>
+                    <a href="{% url 'product_list' %}" class="panel-action-link">Browse Items</a>
+                </div>
+                <div class="panel-body">
+                    {% if buying %}
+                        {% for req in buying|slice:":4" %}
+                            <div class="dash-item">
+                                <div style="min-width: 0;">
+                                    <div class="dash-item-title">{{ req.product.name|truncatechars:38 }}</div>
+                                    <div class="dash-item-meta">Seller: {{ req.product.seller.username }} &bull; ₹{{ req.product.price }}</div>
+                                </div>
+                                <div class="dash-item-actions">
+                                    <span class="badge-pill badge-neutral">{{ req.status }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state" style="padding: 2.5rem 1rem;">
+                            <div class="empty-state-icon" style="width:60px;height:60px;font-size:1.3rem;"><i class="fas fa-shopping-cart"></i></div>
+                            <h5>No requests yet</h5>
+                            <p>Browse the marketplace and request items you like.</p>
+                            <a href="{% url 'product_list' %}" class="btn-outline-custom">Browse Items</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Received Requests Table -->
+    {% if received %}
+    <div class="panel-card mb-4">
+        <div class="panel-header">
+            <h5 class="panel-title"><i class="fas fa-inbox me-2" style="color:var(--warning-color);"></i>Requests for Your Items</h5>
+            <a href="{% url 'manage_requests' %}" class="panel-action-link">
+                View All <i class="fas fa-arrow-right ms-1" style="font-size:0.75rem;"></i>
+            </a>
+        </div>
+        <div class="panel-body p-0">
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Buyer</th>
+                            <th class="d-none d-md-table-cell">Message</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in received|slice:":5" %}
+                            <tr>
+                                <td class="fw-600">{{ req.product.name|truncatechars:28 }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div style="width:26px;height:26px;background:var(--brand-primary-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--brand-primary);">
+                                            {{ req.buyer.username|first|upper }}
+                                        </div>
+                                        {{ req.buyer.username }}
+                                    </div>
+                                </td>
+                                <td class="d-none d-md-table-cell" style="color:var(--text-muted);font-size:0.85rem;">
+                                    {{ req.message|truncatechars:28|default:"—" }}
+                                </td>
+                                <td>
+                                    {% if req.status == 'pending' %}
+                                        <span class="badge-pill badge-warning">{{ req.status }}</span>
+                                    {% elif req.status == 'accepted' %}
+                                        <span class="badge-pill badge-success">{{ req.status }}</span>
+                                    {% else %}
+                                        <span class="badge-pill badge-neutral">{{ req.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'manage_requests' %}" class="btn-outline-custom"
+                                       style="padding: 0.3rem 0.75rem; font-size: 0.78rem; border-radius: var(--radius-sm);">
+                                        Manage
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

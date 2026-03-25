@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Requests - CampusKart{% endblock %}
+
+{% block content %}
+<style>
+    .requests-section {
+        padding: 2rem 0;
+    }
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        color: var(--text-main);
+    }
+    
+    .requests-panel {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    .panel-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        background-color: transparent;
+    }
+    .panel-header h5 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .table th {
+        background-color: var(--bg-main);
+        border-bottom: 1px solid var(--border-color);
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        padding: 1rem 1.5rem;
+    }
+    .table td {
+        vertical-align: middle;
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .product-cell {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 250px;
+    }
+    .product-cell img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-color);
+    }
+    .product-name {
+        font-weight: 600;
+        color: var(--text-main);
+        font-size: 0.95rem;
+        margin-bottom: 0.25rem;
+    }
+    .product-is-sold {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        border: 1px solid var(--border-color);
+        padding: 2px 6px;
+        border-radius: var(--radius-sm);
+        display: inline-block;
+    }
+    
+    .user-name {
+        font-weight: 600;
+        color: var(--text-main);
+        font-size: 0.95rem;
+    }
+    .contact-info {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+    }
+    
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        background: var(--bg-main);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+    }
+    
+    .btn-action-sm {
+        padding: 0.4rem 0.75rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: transparent;
+        border: 1px solid var(--text-muted);
+        color: var(--text-main);
+        transition: all 0.2s;
+    }
+    .btn-action-sm:hover {
+        background: var(--bg-main);
+    }
+    
+    .action-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        min-width: 120px;
+    }
+    .custom-d-inline {
+        display: inline-flex;
+        align-items: flex-end;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 1rem;
+    }
+    .empty-state i {
+        font-size: 2.5rem;
+        color: var(--text-muted);
+        opacity: 0.5;
+        margin-bottom: 1rem;
+    }
+    .empty-state h6 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-main);
+    }
+    .empty-state p {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        margin-bottom: 0;
+    }
+</style>
+
+<div class="container requests-section">
+    <h1 class="page-title">Requests Management</h1>
+    
+    <!-- Requests Received -->
+    <div class="requests-panel">
+        <div class="panel-header">
+            <h5><i class="fas fa-inbox text-muted"></i> Requests Received ({{ received.count }})</h5>
+        </div>
+        
+        {% if received %}
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Buyer Details</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in received %}
+                            <tr>
+                                <td>
+                                    <div class="product-cell">
+                                        <img src="{{ request.product.image.url }}" alt="{{ request.product.name }}">
+                                        <div class="product-name">{{ request.product.name|truncatechars:35 }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="user-name">{{ request.buyer.username }}</div>
+                                    <div class="contact-info"><i class="fas fa-phone fa-sm"></i> {{ request.buyer.profile.phone_number }}</div>
+                                </td>
+                                <td>
+                                    <span class="text-muted" style="font-size: 0.85rem;">{{ request.message|default:"-"|truncatechars:40 }}</span>
+                                </td>
+                                <td>{{ request.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="status-pill">{{ request.status }}</span>
+                                </td>
+                                <td class="text-end">
+                                    {% if request.status == 'pending' %}
+                                        <form method="post" class="action-stack custom-d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="request_id" value="{{ request.id }}">
+                                            <button type="submit" name="action" value="accept" class="btn-action-sm"><i class="fas fa-check"></i> Accept</button>
+                                            <button type="submit" name="action" value="reject" class="btn-action-sm"><i class="fas fa-times"></i> Reject</button>
+                                        </form>
+                                    {% elif request.status == 'accepted' %}
+                                        <form method="post" class="action-stack custom-d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="request_id" value="{{ request.id }}">
+                                            <button type="submit" name="action" value="complete" class="btn-action-sm"><i class="fas fa-handshake"></i> Mark Done</button>
+                                            <button type="submit" name="action" value="reject" class="btn-action-sm"><i class="fas fa-times"></i> Reject</button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-muted" style="font-size: 0.85rem;">No actions</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h6>No requests received</h6>
+                <p>When buyers show interest in your products, they will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Requests Made -->
+    <div class="requests-panel">
+        <div class="panel-header">
+            <h5><i class="fas fa-paper-plane text-muted"></i> Purchase Requests Made ({{ made.count }})</h5>
+        </div>
+        
+        {% if made %}
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Seller Details</th>
+                            <th>Price</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in made %}
+                            <tr>
+                                <td>
+                                    <div class="product-cell">
+                                        <img src="{{ request.product.image.url }}" alt="{{ request.product.name }}">
+                                        <div>
+                                            <div class="product-name">{{ request.product.name|truncatechars:35 }}</div>
+                                            {% if request.product.is_sold %}
+                                                <div class="product-is-sold">Sold Out</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="user-name">{{ request.product.seller.username }}</div>
+                                    
+                                    {% if request.status == 'accepted' %}
+                                        <div class="contact-info" style="color: var(--brand-primary); font-weight: 500;">
+                                            <i class="fas fa-phone fa-sm"></i> {{ request.product.seller.profile.phone_number }}
+                                        </div>
+                                    {% elif request.status == 'pending' %}
+                                        <div class="contact-info">Waiting for approval</div>
+                                    {% elif request.status == 'rejected' %}
+                                        <div class="contact-info">Rejected</div>
+                                    {% else %}
+                                        <div class="contact-info">Contact hidden</div>
+                                    {% endif %}
+                                </td>
+                                <td><strong>₹{{ request.product.price }}</strong></td>
+                                <td>{{ request.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="status-pill">{{ request.status }}</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-shopping-cart"></i>
+                <h6>No purchase requests made</h6>
+                <p>When you request to buy products, they will appear here.</p>
+                <a href="{% url 'product_list' %}" class="btn-outline-custom mt-3">Browse Marketplace</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

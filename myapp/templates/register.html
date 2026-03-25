@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Account - CampusKart{% endblock %}
+
+{% block content %}
+<style>
+    .auth-page {
+        display: flex;
+        justify-content: center;
+        padding: 1rem 1rem 3rem;
+    }
+    .auth-card {
+        width: 100%;
+        max-width: 600px;
+    }
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .auth-logo-mark {
+        width: 52px; height: 52px;
+        background: var(--brand-gradient);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: #fff;
+        margin: 0 auto 1.25rem;
+        box-shadow: 0 4px 16px rgba(16,185,129,0.3);
+    }
+    .auth-title {
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 0.35rem;
+        letter-spacing: -0.5px;
+    }
+    .auth-subtitle { color: var(--text-muted); font-size: 0.92rem; }
+
+    .form-section {
+        margin: 1.75rem 0 0.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1.5px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .form-section-icon {
+        width: 28px; height: 28px;
+        background: var(--brand-primary-light);
+        border-radius: var(--radius-xs);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--brand-primary);
+        font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+    .form-section-title {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin: 0;
+    }
+    .form-text { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.3rem; }
+    .text-danger { font-size: 0.78rem; color: var(--danger-color); margin-top: 0.3rem; display: block; }
+
+    .auth-alert {
+        background: var(--danger-bg);
+        border-left: 4px solid var(--danger-color);
+        padding: 0.9rem 1.1rem;
+        border-radius: var(--radius-sm);
+        margin-bottom: 1.25rem;
+        font-size: 0.875rem;
+        color: #991b1b;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.75rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+    .auth-footer a { color: var(--brand-primary); font-weight: 600; }
+
+    @keyframes cardSlideIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .auth-card { animation: cardSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+</style>
+
+<div class="auth-page">
+    <div class="card-custom auth-card">
+        <div class="auth-header">
+            <div class="auth-logo-mark"><i class="fas fa-shopping-cart"></i></div>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join the SRIT campus marketplace — it's free!</p>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="auth-alert">
+                <i class="fas fa-exclamation-circle mt-1 flex-shrink-0"></i>
+                <div>{% for error in form.non_field_errors %}{{ error }}{% endfor %}</div>
+            </div>
+        {% endif %}
+
+        <div class="info-box mb-3">
+            <i class="fas fa-shield-alt"></i>
+            <div>You must use a valid <strong>@sritcbe.ac.in</strong> email address to register.</div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Account Details -->
+            <div class="form-section mt-0">
+                <div class="form-section-icon"><i class="fas fa-user"></i></div>
+                <span class="form-section-title">Account Details</span>
+            </div>
+
+            <div class="row g-3 mb-1">
+                <div class="col-md-6">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-icon-group">
+                        <i class="fas fa-at input-icon"></i>
+                        <input type="text" name="username" class="form-control" id="username"
+                               placeholder="Choose a username"
+                               value="{{ form.username.value|default:'' }}" required
+                               style="padding-left: 2.6rem;">
+                    </div>
+                    {% if form.username.errors %}<span class="text-danger"><i class="fas fa-circle-exclamation me-1"></i>{{ form.username.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="email" class="form-label">SRIT Email</label>
+                    <div class="input-icon-group">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" name="email" class="form-control" id="email"
+                               placeholder="yourname@sritcbe.ac.in"
+                               value="{{ form.email.value|default:'' }}" required
+                               style="padding-left: 2.6rem;">
+                    </div>
+                    {% if form.email.errors %}
+                        <span class="text-danger"><i class="fas fa-circle-exclamation me-1"></i>{{ form.email.errors.0 }}</span>
+                    {% else %}
+                        <div class="form-text">Must end with @sritcbe.ac.in</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row g-3 mb-1 mt-2">
+                <div class="col-md-6">
+                    <label for="password1" class="form-label">Password</label>
+                    <div class="input-icon-group">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" name="password1" class="form-control" id="password1"
+                               placeholder="Create a strong password" required
+                               style="padding-left: 2.6rem; padding-right: 2.75rem;">
+                        <span class="input-icon-right" onclick="togglePassword('password1', this)"><i class="fas fa-eye"></i></span>
+                    </div>
+                    {% if form.password1.errors %}<span class="text-danger">{{ form.password1.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="password2" class="form-label">Confirm Password</label>
+                    <div class="input-icon-group">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" name="password2" class="form-control" id="password2"
+                               placeholder="Re-enter password" required
+                               style="padding-left: 2.6rem; padding-right: 2.75rem;">
+                        <span class="input-icon-right" onclick="togglePassword('password2', this)"><i class="fas fa-eye"></i></span>
+                    </div>
+                    {% if form.password2.errors %}<span class="text-danger">{{ form.password2.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <!-- Student Profile -->
+            <div class="form-section">
+                <div class="form-section-icon"><i class="fas fa-graduation-cap"></i></div>
+                <span class="form-section-title">Student Profile</span>
+            </div>
+
+            <div class="row g-3 mb-1">
+                <div class="col-md-6">
+                    <label for="phone_number" class="form-label">Phone Number</label>
+                    <div class="input-icon-group">
+                        <i class="fas fa-phone input-icon"></i>
+                        <input type="text" name="phone_number" class="form-control" id="phone_number"
+                               placeholder="10-digit phone number"
+                               value="{{ form.phone_number.value|default:'' }}" required
+                               style="padding-left: 2.6rem;">
+                    </div>
+                    {% if form.phone_number.errors %}<span class="text-danger">{{ form.phone_number.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="department" class="form-label">Department</label>
+                    <select name="department" class="form-select" id="department" required>
+                        <option value="">Select Department</option>
+                        <option value="cse" {% if form.department.value == 'cse' %}selected{% endif %}>Computer Science Engineering</option>
+                        <option value="ece" {% if form.department.value == 'ece' %}selected{% endif %}>Electronics & Communication</option>
+                        <option value="eee" {% if form.department.value == 'eee' %}selected{% endif %}>Electrical & Electronics</option>
+                        <option value="mech" {% if form.department.value == 'mech' %}selected{% endif %}>Mechanical Engineering</option>
+                        <option value="it" {% if form.department.value == 'it' %}selected{% endif %}>Information Technology</option>
+                        <option value="aids" {% if form.department.value == 'aids' %}selected{% endif %}>Artificial Intelligence</option>
+                    </select>
+                    {% if form.department.errors %}<span class="text-danger">{{ form.department.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <div class="row g-3 mb-1 mt-2">
+                <div class="col-md-6">
+                    <label for="current_year" class="form-label">Current Year</label>
+                    <select name="current_year" class="form-select" id="current_year" required>
+                        <option value="">Select Year</option>
+                        <option value="1" {% if form.current_year.value == '1' %}selected{% endif %}>1st Year</option>
+                        <option value="2" {% if form.current_year.value == '2' %}selected{% endif %}>2nd Year</option>
+                        <option value="3" {% if form.current_year.value == '3' %}selected{% endif %}>3rd Year</option>
+                        <option value="4" {% if form.current_year.value == '4' %}selected{% endif %}>4th Year</option>
+                    </select>
+                    {% if form.current_year.errors %}<span class="text-danger">{{ form.current_year.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="graduation_year" class="form-label">Graduation Year</label>
+                    <div class="input-icon-group">
+                        <i class="fas fa-calendar-alt input-icon"></i>
+                        <input type="number" name="graduation_year" class="form-control" id="graduation_year"
+                               placeholder="e.g. 2028" min="2020" max="2035"
+                               value="{{ form.graduation_year.value|default:'' }}" required
+                               style="padding-left: 2.6rem;">
+                    </div>
+                    {% if form.graduation_year.errors %}<span class="text-danger">{{ form.graduation_year.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <!-- Security Question -->
+            <div class="form-section">
+                <div class="form-section-icon"><i class="fas fa-shield-halved"></i></div>
+                <span class="form-section-title">Security Question</span>
+            </div>
+
+            <div class="mb-3">
+                <label for="favorite_food" class="form-label">What is your favorite food?</label>
+                <div class="input-icon-group">
+                    <i class="fas fa-utensils input-icon"></i>
+                    <input type="text" name="favorite_food" class="form-control" id="favorite_food"
+                           placeholder="Used for password recovery"
+                           value="{{ form.favorite_food.value|default:'' }}" required
+                           style="padding-left: 2.6rem;">
+                </div>
+                <div class="form-text">Keep this answer memorable. We'll use it if you forget your password.</div>
+            </div>
+
+            <div class="mt-4 pt-2">
+                <button type="submit" class="btn-primary-custom w-100" style="border-radius: var(--radius-sm); padding: 0.75rem;">
+                    <i class="fas fa-user-plus me-1"></i> Create Account
+                </button>
+            </div>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account? <a href="{% url 'login' %}">Sign in</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword(fieldId, btn) {
+    const field = document.getElementById(fieldId);
+    const icon = btn.querySelector('i');
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+document.getElementById('current_year').addEventListener('change', function() {
+    const curY = new Date().getFullYear();
+    const v = this.value;
+    const map = {'1': 3, '2': 2, '3': 1, '4': 0};
+    if (v) document.getElementById('graduation_year').value = curY + (map[v] || 0);
+});
+</script>
+{% endblock %}

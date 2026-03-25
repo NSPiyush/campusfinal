@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - CampusKart{% endblock %}
+
+{% block content %}
+<style>
+    .product-detail-section {
+        padding: 2rem 0;
+    }
+    
+    .breadcrumb-nav {
+        font-size: 0.85rem;
+        margin-bottom: 2rem;
+        color: var(--text-muted);
+    }
+    .breadcrumb-nav a {
+        color: var(--text-muted);
+        text-decoration: none;
+    }
+    .breadcrumb-nav a:hover {
+        color: var(--text-main);
+    }
+
+    /* Left Image Gallery */
+    .image-gallery {
+        position: sticky;
+        top: calc(var(--navbar-height) + 56px + 1.5rem);
+    }
+    .main-image-container {
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 500px;
+        background-color: var(--bg-card);
+        position: relative;
+    }
+    .main-image-container img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    .sold-badge-large {
+        position: absolute;
+        top: 1.25rem;
+        left: 1.25rem;
+        background: var(--danger-color);
+        color: #fff;
+        padding: 0.4rem 1rem;
+        border-radius: var(--radius-full);
+        font-weight: 800;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 8px rgba(239,68,68,0.35);
+    }
+
+    /* Right Info Details */
+    .product-info-col {
+        padding-left: 2rem;
+    }
+    @media (max-width: 768px) {
+        .product-info-col {
+            padding-left: 0.75rem;
+            margin-top: 2rem;
+        }
+    }
+    .p-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-main);
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+    }
+    .p-seller-link {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+    .p-price-row {
+        margin: 1.5rem 0;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .p-price {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-main);
+        display: block;
+        line-height: 1;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-table {
+        width: 100%;
+        max-width: 400px;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+    }
+    .info-table td {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .info-table tr:last-child td {
+        border-bottom: none;
+    }
+    .info-table td:first-child {
+        color: var(--text-muted);
+        font-weight: 500;
+        width: 120px;
+    }
+    .info-table td:last-child {
+        color: var(--text-main);
+        font-weight: 500;
+    }
+    
+    .about-item-col {
+        margin-top: 2rem;
+    }
+    .about-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        color: var(--text-main);
+    }
+    .about-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        white-space: pre-line;
+    }
+
+    /* The "Buy Box" */
+    .buy-box {
+        border: 1.5px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        background: var(--bg-card);
+        margin-bottom: 1.25rem;
+        box-shadow: var(--shadow-md);
+        position: sticky;
+        top: calc(var(--navbar-height) + 56px + 1.5rem);
+    }
+    .bb-price {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 0.5rem;
+    }
+    .bb-stock {
+        font-size: 1.1rem;
+        color: var(--success-color);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+    .bb-stock.sold {
+        color: var(--text-muted);
+    }
+    
+    .bb-seller-info {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+        line-height: 1.6;
+    }
+    .bb-seller-info span {
+        color: var(--text-main);
+        font-weight: 600;
+    }
+
+    .seller-contact-card {
+        border: 1px solid var(--border-color);
+        padding: 1.25rem;
+        border-radius: var(--radius-lg);
+        background-color: var(--bg-main);
+        margin-top: 1.5rem;
+    }
+</style>
+
+<div class="product-detail-section">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-nav">
+            <a href="{% url 'index' %}">Home</a> &rsaquo; 
+            <a href="{% url 'product_list' %}?category={{ product.category.id }}">{{ product.category.name }}</a> &rsaquo; 
+            <span>{{ product.name|truncatechars:40 }}</span>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Gallery -->
+            <div class="col-lg-5">
+                <div class="image-gallery">
+                    <div class="main-image-container">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <img src="{% static 'images/default-product.jpg' %}" alt="No image available" style="opacity: 0.5;">
+                        {% endif %}
+
+                        {% if product.is_sold %}
+                            <div class="sold-badge-large">Sold Out</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Info -->
+            <div class="col-lg-4 product-info-col">
+                <h1 class="p-title">{{ product.name }}</h1>
+                <a href="#" class="p-seller-link"><i class="fas fa-user-circle"></i> {{ product.seller.username }}</a>
+
+                <div class="p-price-row">
+                    <span class="p-price">₹{{ product.price }}</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Inclusive of all marketplace fees</span>
+                </div>
+
+                <table class="info-table">
+                    <tr>
+                        <td>Category</td>
+                        <td>{{ product.category.name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Condition</td>
+                        <td>{{ product.get_condition_display }}</td>
+                    </tr>
+                    <tr>
+                        <td>Listed On</td>
+                        <td>{{ product.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                </table>
+
+                <div class="about-item-col">
+                    <div class="about-title">About this item</div>
+                    <div class="about-text">{{ product.description }}</div>
+                </div>
+            </div>
+
+            <!-- Right Buy Box -->
+            <div class="col-lg-3">
+                <div class="buy-box">
+                    <div class="bb-price">₹{{ product.price }}</div>
+                    
+                    {% if product.is_sold %}
+                        <div class="bb-stock sold">Sold Out</div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">This item is no longer available.</p>
+                    {% else %}
+                        <div class="bb-stock">Available Now</div>
+                    {% endif %}
+
+                    <div>
+                        {% if user.is_authenticated %}
+                            {% if user == product.seller %}
+                                <a href="{% url 'edit_product' product.id %}" class="btn-outline-custom w-100 mb-2 d-flex justify-content-center">Edit Listing</a>
+                                <button class="btn btn-outline-danger w-100" style="padding: 0.5rem; border-radius: var(--radius-sm); font-weight: 500; font-size: 0.95rem;" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
+                            {% else %}
+                                {% if product.is_sold %}
+                                    <button class="btn-outline-custom w-100 disabled text-muted border-muted" style="opacity: 0.5;">Sold Out</button>
+                                {% else %}
+                                    {% if has_requested %}
+                                        <div class="alert alert-info text-center" style="font-size: 0.85rem; padding: 0.75rem; border-radius: var(--radius-sm); background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main);">
+                                            <i class="fas fa-clock me-1 text-muted"></i> Request pending approval
+                                        </div>
+                                    {% else %}
+                                        <button class="btn-primary-custom w-100" data-bs-toggle="modal" data-bs-target="#requestModal">Send Request</button>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}?next={{ request.path }}" class="btn-primary-custom w-100 d-flex justify-content-center">Sign in to Buy</a>
+                        {% endif %}
+                    </div>
+
+                    <div class="bb-seller-info">
+                        Platform <span>CampusKart</span><br>
+                        Seller <span>{{ product.seller.username }}</span>
+                    </div>
+                </div>
+                
+                <!-- Expanded Seller Card (Visible if owner or accepted) -->
+                {% if is_owner or is_accepted %}
+                    <div class="seller-contact-card">
+                        <h6 style="font-weight: 600; margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-main);">Contact Details</h6>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 2;">
+                            <i class="fas fa-phone text-muted me-2 w-15"></i> {{ product.seller.profile.phone_number }}<br>
+                            <i class="fas fa-graduation-cap text-muted me-2 w-15"></i> {{ product.seller.profile.college_name }}<br>
+                            <i class="fas fa-calendar text-muted me-2 w-15"></i> Batch of {{ product.seller.profile.graduation_year }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Request Modal -->
+<div class="modal fade" id="requestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card-custom p-0 border-0">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold">Request to Buy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'request_product' product.id %}">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <p class="mb-4 text-main font-size-sm">
+                        You are about to send a purchase request to <strong>{{ product.seller.username }}</strong> for <strong>{{ product.name }}</strong> (₹{{ product.price }}).
+                    </p>
+                    <div class="mb-0">
+                        <label for="requestMessage" class="form-label font-size-sm fw-bold">Message to Seller (Optional)</label>
+                        <textarea id="requestMessage" name="message" class="form-control" rows="3" placeholder="Hi, I'm interested..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top p-3">
+                    <button type="button" class="btn-outline-custom" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-primary-custom">Send Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card-custom p-0 border-0">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title text-danger fw-bold">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="mb-0 text-main font-size-sm">Are you sure you want to permanently delete the listing for <strong>{{ product.name }}</strong>?</p>
+            </div>
+            <div class="modal-footer border-top p-3">
+                <button type="button" class="btn-outline-custom" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" action="{% url 'delete_product' product.id %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-primary-custom" style="background-color: var(--danger-color); border-color: var(--danger-color);">Delete Listing</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

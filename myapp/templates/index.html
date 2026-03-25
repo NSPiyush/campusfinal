@@ -1,0 +1,447 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CampusKart - Student Marketplace{% endblock %}
+
+{% block content %}
+<style>
+    /* ---- Hero Banner ---- */
+    .hero-banner {
+        background: linear-gradient(135deg, #10b981 0%, #047857 60%, #065f46 100%);
+        border-radius: 20px;
+        padding: 5rem 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 4rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 24px 48px rgba(16, 185, 129, 0.22), 0 8px 16px rgba(16, 185, 129, 0.1);
+    }
+    .hero-bg-decor {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+    .hero-circle {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(55px);
+    }
+    .hero-circle-1 {
+        width: 420px; height: 420px;
+        background: rgba(255,255,255,0.12);
+        top: -120px; right: -60px;
+    }
+    .hero-circle-2 {
+        width: 280px; height: 280px;
+        background: rgba(52,211,153,0.28);
+        bottom: -60px; right: 180px;
+    }
+    .hero-circle-3 {
+        width: 150px; height: 150px;
+        background: rgba(255,255,255,0.1);
+        bottom: 20px; left: 40%;
+    }
+    .hero-icon-bg {
+        position: absolute;
+        right: 60px;
+        font-size: 18rem;
+        color: rgba(255,255,255,0.07);
+        transform: rotate(-10deg);
+        pointer-events: none;
+        animation: floatIcon 6s ease-in-out infinite;
+    }
+    @keyframes floatIcon {
+        0%, 100% { transform: rotate(-10deg) translateY(0); }
+        50% { transform: rotate(-10deg) translateY(-18px); }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 580px;
+    }
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,0.18);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: #ffffff;
+        padding: 0.4rem 1.1rem;
+        border-radius: var(--radius-full);
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(8px);
+    }
+    .hero-title {
+        font-size: 3.75rem;
+        font-weight: 900;
+        color: #ffffff;
+        margin-bottom: 1.25rem;
+        line-height: 1.05;
+        letter-spacing: -2px;
+    }
+    .hero-title .highlight {
+        color: rgba(255,255,255,0.85);
+        position: relative;
+    }
+    .hero-desc {
+        color: rgba(255,255,255,0.88);
+        font-size: 1.1rem;
+        margin-bottom: 2.5rem;
+        line-height: 1.65;
+        font-weight: 400;
+    }
+    .hero-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .btn-hero-primary {
+        background: #fff;
+        color: var(--brand-primary);
+        padding: 0.85rem 2.25rem;
+        border-radius: var(--radius-full);
+        font-weight: 800;
+        font-size: 1rem;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    .btn-hero-primary:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.16);
+        color: var(--brand-primary-hover);
+    }
+    .btn-hero-secondary {
+        background: rgba(255,255,255,0.12);
+        border: 2px solid rgba(255,255,255,0.35);
+        color: #ffffff;
+        padding: 0.85rem 2.25rem;
+        border-radius: var(--radius-full);
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.22s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(4px);
+    }
+    .btn-hero-secondary:hover {
+        background: rgba(255,255,255,0.2);
+        border-color: rgba(255,255,255,0.6);
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    .hero-stats {
+        display: flex;
+        gap: 2rem;
+        margin-top: 2.5rem;
+        flex-wrap: wrap;
+    }
+    .hero-stat { color: rgba(255,255,255,0.9); }
+    .hero-stat-val { font-size: 1.5rem; font-weight: 800; color: #fff; }
+    .hero-stat-label { font-size: 0.8rem; opacity: 0.75; margin-top: 0.1rem; }
+
+    @media (max-width: 992px) {
+        .hero-banner { padding: 3rem 2rem; flex-direction: column; text-align: center; }
+        .hero-title { font-size: 2.5rem; letter-spacing: -1px; }
+        .hero-icon-bg { opacity: 0.04; font-size: 14rem; right: 50%; transform: translateX(50%); }
+        .hero-actions { justify-content: center; }
+        .hero-stats { justify-content: center; }
+    }
+    @media (max-width: 576px) {
+        .hero-title { font-size: 2rem; }
+    }
+
+    /* ---- Category Pills ---- */
+    .category-scroll {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        margin-bottom: 4rem;
+        scrollbar-width: none;
+    }
+    .category-scroll::-webkit-scrollbar { display: none; }
+    .cat-pill {
+        flex: 0 0 auto;
+        background: var(--bg-card);
+        border: 1.5px solid var(--border-color);
+        padding: 0.7rem 1.4rem;
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: var(--text-main);
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: var(--shadow-xs);
+        cursor: pointer;
+    }
+    .cat-pill i { color: var(--brand-primary); font-size: 1rem; transition: color 0.2s; }
+    .cat-pill:hover {
+        background: var(--brand-gradient);
+        color: #fff;
+        border-color: transparent;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(16,185,129,0.25);
+    }
+    .cat-pill:hover i { color: #fff; }
+
+    /* ---- Product Cards ---- */
+    .product-card {
+        background: var(--bg-card);
+        border: 1.5px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.06);
+        border-color: rgba(16,185,129,0.3);
+    }
+    .product-img-wrapper {
+        height: 210px;
+        position: relative;
+        overflow: hidden;
+        background: var(--bg-elevated);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+    .product-img-wrapper img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .product-card:hover .product-img-wrapper img { transform: scale(1.08); }
+
+    .condition-badge {
+        position: absolute;
+        top: 0.85rem;
+        left: 0.85rem;
+        background: rgba(255,255,255,0.95);
+        color: var(--brand-primary);
+        font-size: 0.72rem;
+        font-weight: 800;
+        padding: 0.3rem 0.75rem;
+        border-radius: var(--radius-full);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(4px);
+        z-index: 2;
+    }
+    .product-card-body {
+        padding: 1.25rem 1.4rem 1.4rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+    .product-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 0.4rem;
+        line-height: 1.4;
+        transition: color 0.2s;
+    }
+    .product-card:hover .product-title { color: var(--brand-primary); }
+    .product-desc {
+        font-size: 0.84rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+        flex-grow: 1;
+        line-height: 1.5;
+    }
+    .card-footer-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 0.85rem;
+        border-top: 1px solid var(--border-color);
+        margin-top: auto;
+    }
+    .product-price {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text-main);
+        letter-spacing: -0.3px;
+    }
+    .seller-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-color);
+        padding: 0.3rem 0.7rem;
+        border-radius: var(--radius-full);
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+    .seller-chip i { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* Wishlist Hover Overlay */
+    .product-card-overlay {
+        position: absolute;
+        top: 0.85rem;
+        right: 0.85rem;
+        opacity: 0;
+        transform: translateY(-6px);
+        transition: all 0.25s ease;
+        z-index: 3;
+    }
+    .product-card:hover .product-card-overlay {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .overlay-btn {
+        width: 34px;
+        height: 34px;
+        background: rgba(255,255,255,0.95);
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    .overlay-btn:hover { color: var(--danger-color); background: #fff; }
+</style>
+
+<div class="container pb-5">
+    <!-- Hero -->
+    <div class="hero-banner">
+        <div class="hero-bg-decor">
+            <div class="hero-circle hero-circle-1"></div>
+            <div class="hero-circle hero-circle-2"></div>
+            <div class="hero-circle hero-circle-3"></div>
+            <i class="fas fa-shopping-cart hero-icon-bg"></i>
+        </div>
+        <div class="hero-content">
+            <span class="hero-badge"><i class="fas fa-bolt"></i> Campus Exclusive</span>
+            <h1 class="hero-title">Your Campus.<br>Your <span class="highlight">Marketplace.</span></h1>
+            <p class="hero-desc">Buy and sell textbooks, electronics, cycles, and daily needs quickly and safely within your SRIT community.</p>
+            <div class="hero-actions">
+                <a href="{% url 'product_list' %}" class="btn-hero-primary">
+                    Start Shopping <i class="fas fa-arrow-right"></i>
+                </a>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="btn-hero-secondary">
+                        <i class="fas fa-user-plus"></i> Join Free
+                    </a>
+                {% else %}
+                    <a href="{% url 'add_product' %}" class="btn-hero-secondary">
+                        <i class="fas fa-plus"></i> Sell Item
+                    </a>
+                {% endif %}
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-val">100%</div>
+                    <div class="hero-stat-label">Student Verified</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-val">Free</div>
+                    <div class="hero-stat-label">To List & Browse</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="section-header">
+        <div>
+            <h2 class="section-title">Explore Categories</h2>
+            <p class="section-subtitle">Find exactly what you need for your semester</p>
+        </div>
+    </div>
+
+    <div class="category-scroll">
+        <a href="{% url 'product_list' %}" class="cat-pill">
+            <i class="fas fa-layer-group"></i> All Items
+        </a>
+        {% for category in categories %}
+            <a href="{% url 'product_list' %}?category={{ category.id }}" class="cat-pill">
+                <i class="{{ category.icon|default:'fas fa-th' }}"></i> {{ category.name }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- Fresh Listings -->
+    <div class="section-header mt-2">
+        <div>
+            <h2 class="section-title">Fresh Listings</h2>
+            <p class="section-subtitle">Newly added items from students on campus</p>
+        </div>
+        <a href="{% url 'product_list' %}" class="btn-outline-custom" style="border-radius: var(--radius-full); padding: 0.5rem 1.25rem; font-size: 0.875rem;">
+            View All <i class="fas fa-chevron-right ms-1" style="font-size:0.75rem;"></i>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for product in products %}
+            <div class="col-6 col-sm-6 col-lg-3">
+                <a href="{% url 'product_detail' product.id %}" class="product-card">
+                    <div class="product-card-overlay">
+                        <div class="overlay-btn"><i class="fas fa-heart"></i></div>
+                    </div>
+                    <div class="condition-badge">{{ product.get_condition_display }}</div>
+                    <div class="product-img-wrapper">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                        {% else %}
+                            <img src="{% static 'images/default-product.jpg' %}" alt="No image" style="opacity:0.4;">
+                        {% endif %}
+                    </div>
+                    <div class="product-card-body">
+                        <div class="product-title">{{ product.name|truncatechars:36 }}</div>
+                        <div class="product-desc">{{ product.description|truncatechars:68 }}</div>
+                        <div class="card-footer-row">
+                            <div class="product-price">₹{{ product.price }}</div>
+                            <div class="seller-chip">
+                                <i class="fas fa-user-circle"></i> {{ product.seller.username|truncatechars:10 }}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="fas fa-box-open"></i></div>
+                    <h4>No Products Yet</h4>
+                    <p>Be the first to list an item in the marketplace!</p>
+                    <a href="{% url 'add_product' %}" class="btn-primary-custom" style="border-radius: var(--radius-full); padding: 0.75rem 2rem;">
+                        <i class="fas fa-plus"></i> List an Item
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
